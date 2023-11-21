@@ -8,11 +8,12 @@
     const form = document.querySelector('form#contact-form');
     const button = document.querySelector('form#contact-form button');
 
-    const nama = document.querySelector('input[name="nama"]');
-    const kontak = document.querySelector('input[name="kontak"]');
-    const pesan = document.querySelector('textarea[name="pesan"]');
-
     form.addEventListener('submit', (e) => {
+
+        const nama = document.querySelector('input[name="nama"]');
+        const kontak = document.querySelector('input[name="kontak"]');
+        const pesan = document.querySelector('textarea[name="pesan"]');
+
         e.preventDefault();
         
         button.setAttribute('disabled', '');
@@ -20,7 +21,11 @@
         kontak.setAttribute('disabled', '');
         pesan.setAttribute('disabled', '');
 
-        var data = new FormData(e.target);
+        const data = new FormData();
+        data.append('nama', nama.value);
+        data.append('kontak', kontak.value);
+        data.append('pesan', pesan.value);
+        
         fetch('https://formspree.io/f/meqbwrol', {
             method: 'POST',
             body: data,
@@ -135,14 +140,14 @@
 /* Used to initialize scroller and parallax
    and to add smooth scrolling to anchored links */
 (() => {
-    const lenis = new Lenis();
-
     new Rellax('.animate-hero2', {
         speed: 2,
     });
     new Rellax('section#iconbg i', {
         speed: -2,
     });
+    
+    /*const lenis = new Lenis();
 
     function raf(time) {
         lenis.raf(time);
@@ -151,7 +156,7 @@
     requestAnimationFrame(raf);
 
 
-    /* Add smooth scrolling to anchor links */
+    * Add smooth scrolling to anchor links *
     window.addEventListener('load', () => {
         const id = window.location.hash.substring(1);
         const target = document.getElementById(id);
@@ -181,5 +186,6 @@
             }
         });
     });
+    */
 
 })();
