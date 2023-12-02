@@ -3,75 +3,118 @@
 
 
 
-/* Input form handling */
+/* Input form handling and add plan button listener */
 (() => {
     const form = document.querySelector('form#contact-form');
     const button = document.querySelector('form#contact-form button');
 
-    form.addEventListener('submit', (e) => {
+    if (form) {
 
         const nama = document.querySelector('input[name="nama"]');
-        const kontak = document.querySelector('input[name="kontak"]');
+        const email = document.querySelector('input[name="email"]');
+        const telp = document.querySelector('input[name="notelp"]');
         const pesan = document.querySelector('textarea[name="pesan"]');
 
-        e.preventDefault();
-        
-        button.setAttribute('disabled', '');
-        nama.setAttribute('disabled', '');
-        kontak.setAttribute('disabled', '');
-        pesan.setAttribute('disabled', '');
+        const personal = document.querySelector('a#pesanPersonal');
+        const shop = document.querySelector('a#pesanShop');
+        const business = document.querySelector('a#pesanBusiness');
 
-        const data = new FormData();
-        data.append('nama', nama.value);
-        data.append('kontak', kontak.value);
-        data.append('pesan', pesan.value);
-        
-        fetch('https://formspree.io/f/meqbwrol', {
-            method: 'POST',
-            body: data,
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-        .then((response) => {
-            button.removeAttribute('disabled');
-            nama.removeAttribute("disabled");
-            kontak.removeAttribute("disabled");
-            pesan.removeAttribute("disabled");
+        personal.addEventListener('click', () => {
+            pesan.value = "Saya ingin memesan jasa pembuatan website untuk personal."
+        });
+        shop.addEventListener('click', () => {
+            pesan.value = "Saya ingin memesan jasa pembuatan website untuk shop produk saya."
+        });
+        business.addEventListener('click', () => {
+            pesan.value = "Saya ingin memesan jasa pembuatan website untuk bisnis saya."
+        });
 
-            if (response.ok) {
-                nama.value = '';
-                kontak.value = '';
-                pesan.value = '';
-                
-                Swal.fire({
-                    html: 'Pesan telah terkirim!<br>Terima kasih sudah menghubungi!',
-                    icon: 'success', toast: true, timer: 3000, showConfirmButton: false,
-                    customClass: { popup: 'w-96 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
-                });
+        form.addEventListener('submit', (e) => {
+    
+            e.preventDefault();
+            
+            button.setAttribute('disabled', '');
+            nama.setAttribute('disabled', '');
+            email.setAttribute('disabled', '');
+            telp.setAttribute('disabled', '');
+            pesan.setAttribute('disabled', '');
+    
+            const data = new FormData();
+            data.append('nama', nama.value);
+            data.append('email', email.value);
+            data.append('phone', telp.value);
+            data.append('pesan', pesan.value);
+            
+            fetch('https://formspree.io/f/meqbwrol', {
+                method: 'POST',
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then((response) => {
+                button.removeAttribute('disabled');
+                nama.removeAttribute("disabled");
+                email.removeAttribute("disabled");
+                telp.removeAttribute("disabled");
+                pesan.removeAttribute("disabled");
+    
+                if (response.ok) {
+                    nama.value = '';
+                    email.value = '';
+                    telp.value = '';
+                    pesan.value = '';
+                    
+                    Swal.fire({
+                        html: 'Pesan telah terkirim!<br>Terima kasih sudah menghubungi!',
+                        icon: 'success', toast: true, timer: 3000, showConfirmButton: false,
+                        customClass: { popup: 'w-96 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
+                    });
+    
+                } else {
+                    response.json().then((data) => {
+                        if ('errors' in data) {
+                            let errors = [];
+                            data['errors'].forEach((element) => {
+                                errors.push(element.message);
+                            });
 
-            } else {
+                            Swal.fire({
+                                html: `Error:<br>${errors.join(',<br>')}`,
+                                icon: 'warning', toast: true, timer: 3000, showConfirmButton: false,
+                                customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
+                            });
+                        } else {
+                            Swal.fire({
+                                html: 'Validasi gagal!<br>Silahkan coba lagi!',
+                                icon: 'warning', toast: true, timer: 3000, showConfirmButton: false,
+                                customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
+                            });
+                        }
+                    }).catch((error) => {
+                        Swal.fire({
+                            html: 'Pesan gagal terkirim!<br>Silahkan coba lagi!',
+                            icon: 'warning', toast: true, timer: 3000, showConfirmButton: false,
+                            customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
+                        });
+                    });
+                }
+            })
+            .catch((error) => {
+                button.removeAttribute('disabled');
+                nama.removeAttribute("disabled");
+                email.removeAttribute("disabled");
+                telp.removeAttribute("disabled");
+                pesan.removeAttribute("disabled");
+    
                 Swal.fire({
                     html: 'Pesan gagal terkirim!<br>Silahkan coba lagi!',
                     icon: 'warning', toast: true, timer: 3000, showConfirmButton: false,
-                    customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-8' }, position: 'top-right'
+                    customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-2' }, position: 'top-right'
                 });
-
-            }
-        })
-        .catch((error) => {
-            button.removeAttribute('disabled');
-            nama.removeAttribute("disabled");
-            kontak.removeAttribute("disabled");
-            pesan.removeAttribute("disabled");
-
-            Swal.fire({
-                html: 'Pesan gagal terkirim!<br>Silahkan coba lagi!',
-                icon: 'warning', toast: true, timer: 3000, showConfirmButton: false,
-                customClass: { popup: 'w-80 px-8 rounded-xl', icon: 'ml-2' }, position: 'top-right'
             });
         });
-    });
+    }
 })();
 
 
@@ -82,30 +125,35 @@
    Also to detect page change and update anchor style */
 (() => {
     const navbar = document.querySelector('nav');
-    const navFunction = () => {
-        if (window.scrollY < 80) {
-            navbar.classList.add('bg-transparent');
-            navbar.classList.remove('bg-blue-700');
-        } else {
-            navbar.classList.add('bg-blue-700');
-            navbar.classList.remove('bg-transparent');
-        }
-
-        listenPageChange();
-    }
-
-    window.addEventListener('load', navFunction);
-    window.addEventListener('scroll', navFunction);
-
+    
     const home = document.getElementById('home');
     const about = document.getElementById('about');
     const work = document.getElementById('work');
+    const plan = document.getElementById('plan');
     const contact = document.getElementById('contact');
 
     const homeHref = document.querySelector('nav div.anchors a[href="#home"]');
     const aboutHref = document.querySelector('nav div.anchors a[href="#about"]');
     const workHref = document.querySelector('nav div.anchors a[href="#work"]');
+    const planHref = document.querySelector('nav div.anchors a[href="#plan"]');
     const contactHref = document.querySelector('nav div.anchors a[href="#contact"]');
+
+    if (navbar) {
+        const navFunction = () => {
+            if (window.scrollY < 80) {
+                navbar.classList.add('bg-transparent');
+                navbar.classList.remove('bg-blue-700');
+            } else {
+                navbar.classList.add('bg-blue-700');
+                navbar.classList.remove('bg-transparent');
+            }
+    
+            listenPageChange();
+        }
+
+        window.addEventListener('load', navFunction);
+        window.addEventListener('scroll', navFunction);
+    }
 
     const listenPageChange = () => {
         const selected = (element) => {
@@ -118,17 +166,19 @@
         }
 
         if (home.getBoundingClientRect().bottom > navbar.offsetHeight) {
-            selected(homeHref); unselected(aboutHref); unselected(workHref); unselected(contactHref);
+            selected(homeHref); unselected(aboutHref); unselected(workHref); unselected(planHref); unselected(contactHref);
 
         } else if (about.getBoundingClientRect().bottom > navbar.offsetHeight) {
-            unselected(homeHref); selected(aboutHref); unselected(workHref); unselected(contactHref);
+            unselected(homeHref); selected(aboutHref); unselected(workHref); unselected(planHref); unselected(contactHref);
 
         } else if (work.getBoundingClientRect().bottom > navbar.offsetHeight) {
-            unselected(homeHref); unselected(aboutHref); selected(workHref); unselected(contactHref);
+            unselected(homeHref); unselected(aboutHref); selected(workHref); unselected(planHref); unselected(contactHref);
+
+        } else if (plan.getBoundingClientRect().bottom > navbar.offsetHeight) {
+            unselected(homeHref); unselected(aboutHref); unselected(workHref); selected(planHref); unselected(contactHref);
 
         } else if (contact.getBoundingClientRect().bottom > navbar.offsetHeight) {
-            unselected(homeHref); unselected(aboutHref); unselected(workHref); selected(contactHref);
-
+            unselected(homeHref); unselected(aboutHref); unselected(workHref); unselected(planHref); selected(contactHref);
         }
     }
 })();
@@ -137,8 +187,7 @@
 
 
 
-/* Used to initialize scroller and parallax
-   and to add smooth scrolling to anchored links */
+/* Used to initialize scroller and parallax */
 (() => {
     new Rellax('.animate-hero2', {
         speed: 2,
@@ -146,46 +195,5 @@
     new Rellax('section#iconbg i', {
         speed: -2,
     });
-    
-    /*const lenis = new Lenis();
-
-    function raf(time) {
-        lenis.raf(time);
-        requestAnimationFrame(raf);
-    }
-    requestAnimationFrame(raf);
-
-
-    * Add smooth scrolling to anchor links *
-    window.addEventListener('load', () => {
-        const id = window.location.hash.substring(1);
-        const target = document.getElementById(id);
-
-        if (target) lenis.scrollTo(target, 300);
-    });
-
-
-    window.addEventListener('hashchange', (e) => {
-        e.preventDefault();
-        const id = window.location.hash.substring(1);
-        const target = document.getElementById(id);
-
-        if (target) lenis.scrollTo(target, 300);
-    });
-
-
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const id = this.getAttribute('href').replace('#', '');
-            const target = document.getElementById(id);
-
-            if (target) {
-                window.location.hash = id;
-                lenis.scrollTo(target, 300);
-            }
-        });
-    });
-    */
 
 })();
